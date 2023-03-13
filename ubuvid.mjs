@@ -17,7 +17,7 @@ async function crawl(href) {
   const dom = new JSDOM(html, { url: url.href })
   const document = dom.window.document
   const links = Array.from(document.querySelectorAll(':any-link'))
-  const htmlLinks = links.filter(a => a.href.endsWith('.html') && a.href !== 'https://www.ubu.com/index.html')
+  const htmlLinks = links.filter(a => a.href.endsWith('.html') && a.pathname !== '/index.html')
   const videoLinks = links.filter(a => a.href.match(/.(m4a|mp4|mkv|m4v)$/g))
   if (videoLinks.length) return videoLinks[rand(videoLinks.length)].href
   if (htmlLinks.length) return crawl(htmlLinks[rand(htmlLinks.length)].href)
