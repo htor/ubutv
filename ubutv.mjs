@@ -7,8 +7,9 @@ import { Readable } from 'stream'
 import { JSDOM } from 'jsdom'
 
 const cache = {}
-const url = 'https://www.ubu.com/film/index.html'
 const videoUrls = []
+const URL = 'https://www.ubu.com/film/index.html'
+const PLAYLIST_FILE = '/tmp/ubutv.m3u'
 const MAX_VIDEOS = 5
 
 function rand(val) {
@@ -57,17 +58,17 @@ async function crawl(href) {
 async function main() {
   while (videoUrls.length < MAX_VIDEOS) {
     let videoUrl
-    while (!(videoUrl = await crawl(url))) {
+    while (!(videoUrl = await crawl(URL))) {
       console.log('RECRAWLING')
     }
     videoUrls.push(videoUrl)
     const videoIndex = videoUrls.indexOf(videoUrl) + 1
     console.log(`FOUND VIDEO (${videoIndex}/${MAX_VIDEOS}): ${videoUrl}`)
   }
-  writeFileSync('/tmp/ubu.m3u', videoUrls.join('\n'))
+  writeFileSync(PLAYLIST_FILE, videoUrls.join('\n'))
   console.log(`LOOPING ${MAX_VIDEOS} VIDEOS`)
   spawnSync('killall vlc', { shell: true })
-  const cmd = spawnSync('vlc --random -f /tmp/ubu.m3u', { shell: true })
+  const cmd = spawnSync(`vlc --random -f ${PLAYLIST_FILE}`, { shell: true })
   Readable.from(cmd.stdout).pipe(process.stdout)
   Readable.from(cmd.stderr).pipe(process.stderr)
   if (cmd.status !== 0) throw new Error(cmd.error ? cmd.error : '')

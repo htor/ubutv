@@ -1,14 +1,16 @@
-# ubuvid
+# ubutv
 
-Fetches a random video from [ubu.com](https://www.ubu.com/film/index.html) and opens it in VLC.
+Fetches random videos from [ubu.com](https://www.ubu.com/film/index.html) and opens them in VLC.
+Supports Linux.
 
 # Usage
 
 Install the packages with [npm](https://npmjs.com/) and run it:
 
 ```
+cd ubutv
 npm install
-./ubuvid.mjs
+./ubutv.sh
 ```
 
 # license
