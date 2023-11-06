@@ -9,7 +9,7 @@ import { JSDOM } from 'jsdom'
 const cache = {}
 const url = 'https://www.ubu.com/film/index.html'
 const videoUrls = []
-let videoUrl
+const MAX_VIDEOS = 5
 
 function rand(val) {
   return Math.floor(Math.random() * val)
@@ -22,40 +22,56 @@ function sleep(ms) {
 }
 
 async function crawl(href) {
+  await sleep(3000)
   const url = new URL(href)
-  if (!url.pathname.startsWith('/film')) return null
+  if (!url.pathname.startsWith('/film')) {
+    return null
+  }
+  console.log('CRAWLING:', href)
   let document = cache[href]
   if (!document) {
-    const res = await fetch(url.href)
+    let res
+    try {
+      res = await fetch(url.href)
+    } catch (err) {
+      return crawl(href)
+    }
     const html = await res.text()
     const dom = new JSDOM(html, { url: url.href })
     cache[href] = document = dom.window.document
   }
   const links = Array.from(document.querySelectorAll(':any-link'))
-  const htmlLinks = links.filter(a => a.href.endsWith('.html') && a.pathname !== '/index.html')
-  const videoLinks = links.filter(a => a.href.match(/.(m4a|mp4|mkv|m4v)$/g))
-  if (videoLinks.length) return videoLinks[rand(videoLinks.length)].href
-  if (htmlLinks.length) return crawl(htmlLinks[rand(htmlLinks.length)].href)
+  const htmlLinks = links.filter(a => 
+    a.href.endsWith('.html') && a.pathname !== '/index.html')
+  const videoLinks = links.filter(a => 
+    a.href.match(/.(m4a|mp4|mkv|m4v)$/g))
+  if (videoLinks.length) {
+    return videoLinks[rand(videoLinks.length)].href
+  }
+  if (htmlLinks.length) {
+    return crawl(htmlLinks[rand(htmlLinks.length)].href)
+  }
   return null
 }
 
 async function main() {
-  while (videoUrls.length < 5) {
-    videoUrl = await crawl(url)
-    while (!videoUrl) {
-      await sleep(3000)
-      videoUrl = await crawl(url)
+  while (videoUrls.length < MAX_VIDEOS) {
+    let videoUrl
+    while (!(videoUrl = await crawl(url))) {
+      console.log('RECRAWLING')
     }
     videoUrls.push(videoUrl)
+    const videoIndex = videoUrls.indexOf(videoUrl) + 1
+    console.log(`FOUND VIDEO (${videoIndex}/${MAX_VIDEOS}): ${videoUrl}`)
   }
   writeFileSync('/tmp/ubu.m3u', videoUrls.join('\n'))
+  console.log(`LOOPING ${MAX_VIDEOS} VIDEOS`)
+  spawnSync('killall vlc', { shell: true })
   const cmd = spawnSync('vlc --random -f /tmp/ubu.m3u', { shell: true })
   Readable.from(cmd.stdout).pipe(process.stdout)
   Readable.from(cmd.stderr).pipe(process.stderr)
-
-  if (cmd.status !== 0) {
-    throw new Error(cmd.error ? cmd.error : '')
-  }
+  if (cmd.status !== 0) throw new Error(cmd.error ? cmd.error : '')
+  exit(0)
 }
 
 main()
