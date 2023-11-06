@@ -8,7 +8,7 @@ import { JSDOM } from 'jsdom'
 
 const cache = {}
 const videoUrls = []
-const URL = 'https://www.ubu.com/film/index.html'
+const CRAWL_URL = 'https://www.ubu.com/film/index.html'
 const PLAYLIST_FILE = '/tmp/ubutv.m3u'
 const MAX_VIDEOS = 5
 
@@ -58,7 +58,7 @@ async function crawl(href) {
 async function main() {
   while (videoUrls.length < MAX_VIDEOS) {
     let videoUrl
-    while (!(videoUrl = await crawl(URL))) {
+    while (!(videoUrl = await crawl(CRAWL_URL))) {
       console.log('RECRAWLING')
     }
     videoUrls.push(videoUrl)

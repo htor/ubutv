@@ -2,7 +2,7 @@
 
 set -e
 
-./ubutv.mjs | 
+$HOME/Programming/ubutv/ubutv.mjs | 
   while read line 
     do echo -e "$(date -Iseconds) $line" >> /tmp/ubutv.log
   done
