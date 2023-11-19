@@ -68,7 +68,7 @@ async function main() {
   writeFileSync(PLAYLIST_FILE, videoUrls.join('\n'))
   console.log(`LOOPING ${MAX_VIDEOS} VIDEOS`)
   spawnSync('killall vlc', { shell: true })
-  const cmd = spawnSync(`vlc --random -f ${PLAYLIST_FILE}`, { shell: true })
+  const cmd = spawnSync(`vlc --no-interact --random -f ${PLAYLIST_FILE}`, { shell: true })
   Readable.from(cmd.stdout).pipe(process.stdout)
   Readable.from(cmd.stderr).pipe(process.stderr)
   if (cmd.status !== 0) throw new Error(cmd.error ? cmd.error : '')
