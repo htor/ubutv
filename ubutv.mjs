@@ -42,9 +42,9 @@ async function crawl(href) {
     cache[href] = document = dom.window.document
   }
   const links = Array.from(document.querySelectorAll(':any-link'))
-  const htmlLinks = links.filter(a => 
+  const htmlLinks = links.filter(a =>
     a.href.endsWith('.html') && a.pathname !== '/index.html')
-  const videoLinks = links.filter(a => 
+  const videoLinks = links.filter(a =>
     a.href.match(/.(m4a|mp4|mkv|m4v)$/g))
   if (videoLinks.length) {
     return videoLinks[rand(videoLinks.length)].href
@@ -68,10 +68,16 @@ async function main() {
   writeFileSync(PLAYLIST_FILE, videoUrls.join('\n'))
   console.log(`LOOPING ${MAX_VIDEOS} VIDEOS`)
   spawnSync('killall vlc', { shell: true })
-  const cmd = spawnSync(`vlc --no-interact --random -f ${PLAYLIST_FILE}`, { shell: true })
+  let cmd
+  if (process.platform === 'linux') {
+    cmd = spawnSync(`vlc --no-interact --random -f ${PLAYLIST_FILE}`, { shell: true })
+  }
+  if (process.platform === 'darwin') {
+    cmd = spawnSync(`open -na VLC.app --args --no-interact --random -f ${PLAYLIST_FILE}`, { shell: true })
+  }
   Readable.from(cmd.stdout).pipe(process.stdout)
   Readable.from(cmd.stderr).pipe(process.stderr)
-  if (cmd.status !== 0) throw new Error(cmd.error ? cmd.error : '')
+  if (cmd.status !== 0) throw new Error(cmd.error ? cmd.error : cmd)
   exit(0)
 }
 
