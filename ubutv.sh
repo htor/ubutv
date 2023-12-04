@@ -2,9 +2,10 @@
 
 set -e
 
-echo -e 'WELCOME TO UBUTV!\n\nSEARCHING FOR VIDEOS...'
+dir=$(dirname $0)
+echo -e 'WELCOME TO UBUTV!\nSEARCHING FOR VIDEOS...'
 
-./ubutv.mjs 2>&1 |
+$dir/ubutv.mjs 2>&1 |
   while read line
   do
     echo -e "$(date -Iseconds) $line" >> ./ubutv.log
