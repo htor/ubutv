@@ -10,7 +10,8 @@ your TV set:
 
 # usage
 
-First install [node](https://nodejs.org/en) using your preferred method. Then to install and run:
+First install [node](https://nodejs.org/en) and [VLC](https://www.videolan.org/vlc/) 
+using your preferred method. Then to install and run:
 
 ```
 cd ubutv
