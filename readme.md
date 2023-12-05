@@ -3,8 +3,9 @@
 Fetches random videos from [ubu.com](https://www.ubu.com/film/index.html) and opens them in VLC.
 Supports Linux and Mac.
 
-For increased pleasure, consider running your scipt on a Raspberry Pi and plug that into 
+For increased pleasure, consider running the script on a Raspberry Pi and plug that into 
 your TV set:
+
 <img src="pics/rpi.png" width="720px">
  
 
